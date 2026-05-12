@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRIADA </title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#0f172a,#1e293b,#020617);
+    color:white;
+    overflow:hidden;
+}
+
+.screen{
+    width:100vw;
+    height:100vh;
+    display:none;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+}
+
+.active{
+    display:flex;
+}
+
+h1{
+    font-size:60px;
+    color:#38bdf8;
+    text-shadow:0 0 20px #38bdf8;
+}
+
+.slogan{
+    margin-top:15px;
+    font-size:22px;
+    color:#cbd5e1;
+    text-align:center;
+    width:70%;
+}
+
+.menu{
+    margin-top:40px;
+    display:flex;
+    gap:30px;
+    flex-wrap:wrap;
+    justify-content:center;
+}
+
+.game-card{
+    width:260px;
+    height:220px;
+    background:rgba(255,255,255,0.08);
+    border:2px solid #38bdf8;
+    border-radius:20px;
+    padding:20px;
+    transition:0.3s;
+    cursor:pointer;
+    backdrop-filter:blur(5px);
+}
+
+.game-card:hover{
+    transform:scale(1.05);
+    box-shadow:0 0 25px #38bdf8;
+}
+
+.game-card h2{
+    color:#38bdf8;
+    margin-bottom:15px;
+}
+
+.btn{
+    margin-top:20px;
+    padding:12px 25px;
+    border:none;
+    border-radius:10px;
+    background:#38bdf8;
+    color:black;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.btn:hover{
+    background:white;
+}
+
+#mineBoard{
+    display:grid;
+    grid-template-columns:repeat(10,45px);
+    gap:5px;
+    margin-top:20px;
+}
+
+.cell{
+    width:45px;
+    height:45px;
+    background:#334155;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-weight:bold;
+    cursor:pointer;
+    border-radius:8px;
+}
+
+.cell:hover{
+    background:#475569;
+}
+
+.revealed{
+    background:#cbd5e1;
+    color:black;
+}
+
+.mine{
+    background:red;
+}
+
+#memoryBoard{
+    display:grid;
+    grid-template-columns:repeat(5,100px);
+    gap:15px;
+    margin-top:20px;
+}
+
+.card{
+    width:100px;
+    height:100px;
+    background:#38bdf8;
+    border-radius:15px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:40px;
+    cursor:pointer;
+    color:transparent;
+    transition:0.3s;
+}
+
+.card.flip{
+    background:white;
+    color:black;
+}
+
+input{
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    width:200px;
+    text-align:center;
+    font-size:18px;
+}
+
+.message{
+    margin-top:20px;
+    font-size:22px;
+    color:#facc15;
+}
+
+.topbar{
+    position:absolute;
+    top:20px;
+    left:20px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- MENU -->
+<div id="menu" class="screen active">
+    <h1>TRIADA</h1>
+
+    <p class="slogan">
+        “Tres desafíos. Una sola misión ganar: para demostrar que eres un campeon.”
+    </p>
+
+    <div class="menu">
+
+        <div class="game-card" onclick="showScreen('minesweeper')">
+            <h2> Buscaminas cabum cabum </h2>
+            <p>
+                Encuentra las minas, evita las trampas y sobrevive al campo de batalla (osea el tablero).
+            </p>
+        </div>
+
+        <div class="game-card" onclick="showScreen('memory')">
+            <h2>Memorama Neural</h2>
+            <p>
+                Pon a prueba tu memoria de pez con cartas y tiempo limitado.
+            </p>
+        </div>
+
+        <div class="game-card" onclick="showScreen('guess')">
+            <h2>Adiviname</h2>
+            <p>
+                Adivina el número oculto usando pistas y usando tu inteligencia.
+            </p>
+        </div>
+
+    </div>
+</div>
+
+<!-- MINESWEEPER -->
+<div id="minesweeper" class="screen">
+    <div class="topbar">
+        <button class="btn" onclick="backMenu()">⬅ Menú</button>
+    </div>
+
+    <h1>💣 Buscaminas Cabum Cabum</h1>
+    <p>Minas ocultas: <span id="mineCount"></span></p>
+
+    <div id="mineBoard"></div>
+</div>
+
+<!-- MEMORY -->
+<div id="memory" class="screen">
+    <div class="topbar">
+        <button class="btn" onclick="backMenu()">⬅ Menú</button>
+    </div>
+
+    <h1>🧠 Memorama Neural</h1>
+
+    <p>Encuentra todas las parejas antes de perder.</p>
+
+    <h2 id="timer">⏰ Tiempo: 50</h2>
+
+    <div id="memoryBoard"></div>
+
+    <div class="message" id="memoryMsg"></div>
+</div>
+
+<!-- GUESS -->
+<div id="guess" class="screen">
+    <div class="topbar">
+        <button class="btn" onclick="backMenu()">⬅ Menú</button>
+    </div>
+
+    <h1>🎯 Adiviname</h1>
+
+    <p>Adivina un número del 1 al 100</p>
+
+    <input type="number" id="guessInput" placeholder="Ingresa número">
+
+    <button class="btn" onclick="checkGuess()">Intentar</button>
+
+    <div class="message" id="guessMsg"></div>
+</div>
+
+<script>
+function showScreen(id){
+    document.querySelectorAll(".screen").forEach(s=>{
+        s.classList.remove("active");
+    });
+
+    document.getElementById(id).classList.add("active");
+}
+
+function backMenu(){
+    showScreen("menu");
+}
+
+/////////////////////////////////////////////////
+// BUSCAMINAS
+/////////////////////////////////////////////////
+
+const board = document.getElementById("mineBoard");
+const size = 10;
+const mines = 15;
+let minePositions = [];
+
+document.getElementById("mineCount").innerText = mines;
+
+function createBoard(){
+
+    board.innerHTML = "";
+    minePositions = [];
+
+    while(minePositions.length < mines){
+        let pos = Math.floor(Math.random()*100);
+
+        if(!minePositions.includes(pos)){
+            minePositions.push(pos);
+        }
+    }
+
+    for(let i=0;i<100;i++){
+
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.dataset.index = i;
+
+        cell.addEventListener("click",()=>revealCell(cell,i));
+
+        board.appendChild(cell);
+    }
+}
+
+function revealCell(cell,index){
+
+    if(cell.classList.contains("revealed")) return;
+
+    cell.classList.add("revealed");
+
+    if(minePositions.includes(index)){
+
+        cell.classList.add("mine");
+        cell.innerHTML="💣";
+
+        setTimeout(()=>{
+            alert("💥 PERDISTE (LOL que mal)");
+            createBoard();
+        },300);
+
+    }else{
+
+        let count = countMines(index);
+        cell.innerText = count === 0 ? "" : count;
+    }
+}
+
+function countMines(index){
+
+    let total = 0;
+
+    minePositions.forEach(m=>{
+        if(Math.abs(m-index)<=11){
+            total++;
+        }
+    });
+
+    return total;
+}
+
+createBoard();
+
+/////////////////////////////////////////////////
+// MEMORAMA
+/////////////////////////////////////////////////
+
+const emojis = [
+"🔥","👾","⚡","🎮","🚀",
+"💎","🧠","🎲","👻","🌟",
+"🔥","👾","⚡","🎮","🚀",
+"💎","🧠","🎲","👻","🌟"
+];
+
+let shuffled = emojis.sort(()=>0.5 - Math.random());
+
+const memoryBoard = document.getElementById("memoryBoard");
+
+let firstCard = null;
+let secondCard = null;
+let lock = false;
+let matches = 0;
+
+let timeLeft = 50;
+let timer;
+
+function startTimer(){
+
+    clearInterval(timer);
+
+    timer = setInterval(()=>{
+
+        timeLeft--;
+
+        document.getElementById("timer").innerText =
+        `⏰ Tiempo: ${timeLeft}`;
+
+        if(timeLeft <= 0){
+
+            clearInterval(timer);
+
+            document.getElementById("memoryMsg").innerText =
+            "💀 Se acabó el tiempo";
+
+            lock = true;
+        }
+
+    },1000);
+}
+
+function createMemory(){
+
+    memoryBoard.innerHTML = "";
+
+    shuffled = emojis.sort(()=>0.5 - Math.random());
+
+    matches = 0;
+    timeLeft = 50;
+
+    firstCard = null;
+    secondCard = null;
+    lock = false;
+
+    document.getElementById("memoryMsg").innerText = "";
+
+    startTimer();
+
+    shuffled.forEach(emoji=>{
+
+        const card = document.createElement("div");
+
+        card.classList.add("card");
+        card.innerText = emoji;
+
+        card.addEventListener("click",()=>flipCard(card));
+
+        memoryBoard.appendChild(card);
+    });
+}
+
+function flipCard(card){
+
+    if(lock) return;
+    if(card.classList.contains("flip")) return;
+
+    card.classList.add("flip");
+
+    if(!firstCard){
+
+        firstCard = card;
+
+    }else{
+
+        secondCard = card;
+        lock = true;
+
+        if(firstCard.innerText === secondCard.innerText){
+
+            matches++;
+
+            firstCard = null;
+            secondCard = null;
+            lock = false;
+
+            if(matches === 10){
+
+                clearInterval(timer);
+
+                document.getElementById("memoryMsg").innerText =
+                "🏆 ¡Ganaste el memorama!";
+            }
+
+        }else{
+
+            setTimeout(()=>{
+
+                firstCard.classList.remove("flip");
+                secondCard.classList.remove("flip");
+
+                firstCard = null;
+                secondCard = null;
+                lock = false;
+
+            },1000);
+        }
+    }
+}
+
+createMemory();
+
+/////////////////////////////////////////////////
+// ADIVINAR NUMERO
+/////////////////////////////////////////////////
+
+let secret = Math.floor(Math.random()*100)+1;
+let attempts = 0;
+
+function checkGuess(){
+
+    let value = Number(document.getElementById("guessInput").value);
+    let msg = document.getElementById("guessMsg");
+
+    attempts++;
+
+    if(value === secret){
+
+        msg.innerHTML =
+        `🏆 ¡Correcto! El número era ${secret}. Intentos: ${attempts}`;
+
+        secret = Math.floor(Math.random()*100)+1;
+        attempts = 0;
+
+    }else if(value < secret){
+
+        msg.innerHTML =
+        `📉 Más alto... Intentos restantes: ${7 - attempts}`;
+
+    }else{
+
+        msg.innerHTML =
+        `📈 Más bajo... Intentos restantes: ${7 - attempts}`;
+    }
+
+    if(attempts >= 7){
+
+        msg.innerHTML =
+        `💀 Perdiste. El número era ${secret}`;
+
+        secret = Math.floor(Math.random()*100)+1;
+        attempts = 0;
+    }
+}
+</script>
+
+</body>
+</html>
